@@ -7,13 +7,13 @@ Description: >
 
 Globals:
   Function:
-    Timeout: 3
+    Timeout: 5
 
 Resources:
   DailyTaoFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: daily-tao/
+      CodeUri: daily_tao/
       Handler: app.lambda_handler
       Runtime: python3.8
       Events:
