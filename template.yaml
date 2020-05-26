@@ -1,0 +1,23 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  daily-tao
+
+  Lambda template for daily-tao service
+
+Globals:
+  Function:
+    Timeout: 3
+
+Resources:
+  DailyTaoFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: daily-tao/
+      Handler: app.lambda_handler
+      Runtime: python3.8
+      Events:
+        DailySchedule:
+          Type: Schedule
+          Properties:
+            Schedule: 'cron(0 16 * * ? *)'
