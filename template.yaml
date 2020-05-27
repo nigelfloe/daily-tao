@@ -21,3 +21,12 @@ Resources:
           Type: Schedule
           Properties:
             Schedule: 'cron(0 16 * * ? *)'
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: 'Users'
+        - Statement:
+          - Effect: Allow
+            Action:
+              - 'sns:Publish'
+            Resource:
+              - '*'
