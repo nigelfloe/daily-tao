@@ -16,6 +16,6 @@ def add_user(phone_number):
 
 if __name__ == "__main__":
     parser = ArgumentParser()
-    parser.add_argument('-p', '--phone')
+    parser.add_argument('-p', '--phone', required=True)
     args = parser.parse_args()
     add_user(args.phone)
