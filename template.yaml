@@ -22,11 +22,7 @@ Resources:
           Properties:
             Schedule: 'cron(0 16 * * ? *)'
       Policies:
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn: 'arn:aws:secretsmanager:us-east-1:824057463517:secret:twilio-oFotiW'
         - DynamoDBCrudPolicy:
             TableName: 'Users'
-        - Statement:
-          - Effect: Allow
-            Action:
-              - 'sns:Publish'
-            Resource:
-              - '*'

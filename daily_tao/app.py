@@ -13,8 +13,8 @@ def lambda_handler(event, context):
     if users:
         aws_session = boto3.session.Session()
         secret_client = aws_session.client(service_name='secretsmanager')
-        twilio_creds = (secret_client.get_secret_value(SecretId='twilio')
-                        ['SecretString'])
+        twilio_creds = json.loads(
+            secret_client.get_secret_value(SecretId='twilio')['SecretString'])
         twilio = Client(twilio_creds['account_sid'],
                         twilio_creds['auth_token'])
     for user in users:
