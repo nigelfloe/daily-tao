@@ -1,4 +1,5 @@
 import json
+from datetime import date
 
 import boto3
 from boto3.dynamodb.conditions import Attr
@@ -18,23 +19,35 @@ def lambda_handler(event, context):
         twilio = Client(twilio_creds['account_sid'],
                         twilio_creds['auth_token'])
     for user in users:
+        phone_number = user['phone']
+        today = date.today().isoformat()
         last_chapter = (int(user['last_chapter']) if 'last_chapter' in user
                         else 0)
-        todays_chapter = str(last_chapter + 1)
-        with open('tao.json') as tao_source:
-            tao = json.load(tao_source)
-        if todays_chapter in tao:
-            twilio.messages.create(
-                body=tao[todays_chapter],
-                from_='+12055798634',
-                to=user['phone'])
-            user['last_chapter'] = todays_chapter
+        last_sent_date = (user['last_sent_date'] if 'last_sent_date' in user
+                          else None)
+        if today == last_sent_date:
+            print('{} already received chapter {} on {}'
+                  .format(phone_number, last_chapter, last_sent_date))
         else:
-            user['finished'] = True
-        users_table.update_item(
-            Key={'phone': user['phone']},
-            UpdateExpression='SET last_chapter=:lc, finished=:f',
-            ExpressionAttributeValues={
-                ':lc': todays_chapter,
-                ':f': user.get('finished', False)
-            })
+            todays_chapter = str(last_chapter + 1)
+            with open('tao.json') as tao_source:
+                tao = json.load(tao_source)
+            if todays_chapter in tao:
+                print('sending chapter {} to {}'.format(todays_chapter,
+                                                        phone_number))
+                twilio.messages.create(
+                    body=tao[todays_chapter],
+                    from_='+12055798634',
+                    to=phone_number)
+                user['last_chapter'] = todays_chapter
+            else:
+                user['finished'] = True
+            users_table.update_item(
+                Key={'phone': user['phone']},
+                UpdateExpression='SET last_chapter=:lc, finished=:f, '
+                                 'last_sent_date=:lsd',
+                ExpressionAttributeValues={
+                    ':lc': todays_chapter,
+                    ':f': user.get('finished', False),
+                    ':lsd': today
+                })
